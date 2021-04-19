@@ -55,7 +55,19 @@
 </script>
 
 <script lang="ts">
-	export let metarData: MetarData;
+	import Metar from "$lib/components/Metar.svelte"
+	import MetarRaw from "$lib/components/MetarRaw.svelte"
+
+	export let metarData: MetarData
+
+	let toggleText: string = "Raw"
+	let changeShow = () => {
+		if (toggleText == "Raw") {
+			toggleText = "Decoded"
+		} else {
+			toggleText = "Raw"
+		}
+	}
 </script>
 
 <svelte:head>
@@ -64,59 +76,20 @@
 
 <main>
 	<div class="container">
-		<div class="row mt-3">
-			{#if metarData != undefined}
-				<div>
-					<strong>Observation Time</strong>
-				</div>
-				<div>
-					{metarData.observationTime.toLocaleString()}
-				</div>
-				<div>
-					<strong>Wind</strong>
-				</div>
-				<div>
-					{metarData.windSpeed} kt {#if metarData.windSpeed > 0} @ {metarData.windDir}° {/if}
-				</div>
-				<div>
-					<strong>Visibility</strong>
-				</div>
-				<div>
-					{metarData.visibilitySM} SM
-				</div>
-				<div>
-					<div>
-						<strong>Sky Condition</strong>
-					</div>
-					{#each metarData.skyCondition as skyCondition}
-						<div>
-							{#if skyCondition.cloudBaseAgl == undefined}
-								Sky Cover: {skyCondition.skyCover}
-							{:else}
-								Sky Cover: {skyCondition.skyCover} @ {skyCondition.cloudBaseAgl} AGL
-							{/if}
-						</div>
-					{/each}
-				</div>
-				<div>
-					<strong>Temperature</strong>
-				</div>
-				<div>
-					{metarData.temp}°C
-				</div>
-				<div>
-					<strong>Dewpoint</strong>
-				</div>
-				<div>
-					{metarData.dewpoint}°C
-				</div>
-				<div>
-					<strong>Altimeter</strong>
-				</div>
-				<div>
-					{metarData.altimHg} inHg
-				</div>
-			{/if}
+		<div class="d-flex flex-row p-3">
+			<div class="flex-grow-1">
+				{#if metarData != undefined}
+					{#if toggleText == "Raw"}
+						<Metar metarData={metarData} />
+					{:else}
+						<MetarRaw metarData={metarData} />
+					{/if}
+				{/if}
+			</div>
+
+			<div>
+				<a on:click={changeShow}>{toggleText}</a>
+			</div>
 		</div>
 
 		<div class="d-flex flex-row-reverse">
@@ -132,15 +105,6 @@
 </main>
 
 <style>
-	main {
-		font-family: 'Overpass', sans-serif;
-		font-size: 3.5vh;
-	}
-
-	strong {
-		font-size: 4vh;
-	}
-
 	h1 {
 		font-family: 'Overpass Mono', monospace;
 		font-size: 7vh;
